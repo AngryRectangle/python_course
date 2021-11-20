@@ -32,19 +32,17 @@ def collector(input, output):
                 continue
 
             if word not in dictionary:
-                dictionary[word] = (0, [])
+                dictionary[word] = []
 
             current = dictionary[word]
-            current[1].append(count)
-            dictionary[word] = (current[0] + 1, current[1])
+            current.append(count)
+            dictionary[word] = current
             count += 1
 
-    values = list((k, v[0], v[1]) for k, v in dictionary.items())
-    values.sort(key=lambda x: x[2][0])
     arr = []
-    for value in values:
-        joined = " ".join(list(map(lambda x: str(x), value[2])))
-        arr.append(value[0] + " " + str(value[1]) + " " + joined)
+    for key, value in dictionary.items():
+        joined = " ".join(list(map(lambda x: str(x), value)))
+        arr.append(key + " " + str(len(value)) + " " + joined)
 
     file = open(output, "w", encoding="utf-8")
     file.write("\n".join(arr))
