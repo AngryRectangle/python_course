@@ -1,56 +1,50 @@
 from pathlib import Path
 import re
+import string
 
 
 def collector(input, output):
-    content = ""
-    for line in open(input, encoding='utf-8'):
-        content += line
-
-    re.UNICODE = True
-    prog = re.compile("[a-zа-я]+")
-    content = content.replace("\n", " ")
-    #content = content.replace("", " ")
-    #content = content.replace("", " ")
-    result = content.split()
+    punc = string.punctuation
+    punc = punc.replace("-", "")
+    punc = punc.replace("'", "")
     dictionary = dict()
-    for word in result:
-        match = re.findall(prog, word.lower())
-        if match is None:
-            continue
-        lower = ""
-        for word in match:
-            lower+=word
+    for content in open(input, encoding='utf-8'):
+        content = content.replace("\n", " ")
+        for l in punc:
+            content = content.replace(l, " ")
 
-        if lower.isspace() or lower == "`" or lower == "" or lower == "-" or lower == "_":
-            continue
+        result = content.split()
+        for word in result:
+            lower = word.lower()
+            if lower[-1] == "-" or lower[-1] == "'":
+                lower = lower[:-1]
 
-        if lower not in dictionary:
-            dictionary[lower] = 0
-        dictionary[lower] += 1
-
-    sum = 0
-    for value in dictionary.values():
-        sum += value
+            if lower == "":
+                continue
+            if lower not in dictionary:
+                dictionary[lower] = 0
+            dictionary[lower] += 1
 
     arr = []
-    for word in result:
-        match = re.findall(prog, word.lower())
-        if match is None:
-            continue
-        lower = ""
-        for word in match:
-            lower += word
+    for content in open(input, encoding='utf-8'):
+        content = content.replace("\n", " ")
+        for l in punc:
+            content = content.replace(l, " ")
 
-        if lower.isspace() or lower == "`" or lower == "":
-            continue
+        result = content.split()
+        for word in result:
+            lower = word.lower()
+            if lower[-1] == "-" or lower[-1] == "'":
+                lower = lower[:-1]
 
-        if lower in dictionary:
-            arr.append(lower + " " + str(dictionary[lower]))
-            dictionary.pop(lower)
+            if lower in dictionary:
+                arr.append(lower + " " + str(dictionary[lower]))
+                dictionary.pop(lower)
 
     file = open(output, "w", encoding="utf-8")
     file.write("\n".join(arr))
+    if len(arr) > 0:
+        file.write("\n")
     file.close()
 
 # collector("input.txt", "output.txt")
