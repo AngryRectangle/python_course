@@ -7,6 +7,7 @@ import os
 import sys
 
 import shutil
+import string
 
 from common.test_runner import run_tests
 from itertools import chain
@@ -35,10 +36,10 @@ class FileMachine:
         res = filecmp.cmp(self.output, self.gold_output)
         if not res:
             print("Actual:")
-            with open(self.output, "r") as f:
+            with open(self.output, "r", encoding="utf-8") as f:
                 print(f.read())
             print("Expected:")
-            with open(self.gold_output, "r") as f:
+            with open(self.gold_output, "r", encoding="utf-8") as f:
                 print(f.read())
             assert filecmp.cmp(self.output, self.gold_output)
 
@@ -65,21 +66,18 @@ def randword():
         word.append(random.choice(start))
     if (random.randint(0, 40) == 0):
         word.insert(3, '-')
+    if (word[-1] == 's'):
+        if (random.randint(0, 40) == 0):
+            word.insert(-1, "'")
     return "".join(word)
 
 
-whitespaces = [" ", " ", " ", "\n", "\t"]
-
-arr_sep_right = ",:;.!?"
-
-arr_sep_both = "-–"
-
-
 def separator():
+    whitespaces = string.whitespace
     if (random.randrange(0, 30) == 0):
-        return random.choice(whitespaces) + random.choice(arr_sep_both) + random.choice(whitespaces)
+        return random.choice(whitespaces) + random.choice(string.punctuation) + random.choice(whitespaces)
     if (random.randrange(0, 5) == 0):
-        return random.choice(arr_sep_right) + random.choice(whitespaces)
+        return random.choice(string.punctuation) + random.choice(whitespaces)
     return random.choice(whitespaces)
 
 
@@ -129,6 +127,17 @@ class TestBase(unittest.TestCase):
         fm.check_equality()
         fm.remove()
 
+    def test_0(self):
+        self.base(0, 0)
+
+    def test_spaces(self):
+        fm = FileMachine()
+        with open(fm.input, "w", encoding="utf-8") as f:
+            for i in range(100):
+                f.write(string.whitespace)
+        fm.check_equality()
+        fm.remove()
+
     def test_1(self):
         self.base(6, 3)
 
@@ -154,6 +163,10 @@ class TestBase(unittest.TestCase):
     def test_max(self):
         for i in range(100):
             self.base(600, 400)
+    
+    def test_maximum(self):
+        for i in range(10):
+            self.base(6000, 4000)
 
 
 class CollectorTestCase(TestBase):
