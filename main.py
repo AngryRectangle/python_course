@@ -22,7 +22,7 @@ for ip in ips:
     else:
         result[key] += 1
 
-show = list(
+result = pd.DataFrame(
     {'country': key.country, 'region': key.region, 'city': key.city, 'count': value} for key, value in result.items())
-fig = px.sunburst(pd.DataFrame(show), path=['country', 'region', 'city'], values='count')
+fig = px.sunburst(result, path=['country', 'region', 'city'], values='count')
 fig.show()
